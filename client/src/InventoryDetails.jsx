@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 function InventoryDetails() {
@@ -17,7 +17,7 @@ function InventoryDetails() {
       .catch((error) => console.log(error));
   }, [id]);
 
-  const fetchItems = async () => {
+  const fetchItems = useCallback(async () => {
     try {
       const res = await fetch(`http://localhost:5000/inventories/${id}/items`);
       const data = await res.json();
@@ -25,11 +25,11 @@ function InventoryDetails() {
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     fetchItems();
-  }, [id]);
+  }, [fetchItems]);
 
   const handleAddItem = async () => {
     if (!name || !description) {
@@ -63,8 +63,7 @@ function InventoryDetails() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("userEmail");
+    localStorage.clear();
     navigate("/login");
   };
 
