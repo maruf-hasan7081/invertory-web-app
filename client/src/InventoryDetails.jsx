@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 function InventoryDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [inventory, setInventory] = useState(null);
   const [items, setItems] = useState([]);
   const [name, setName] = useState("");
@@ -60,24 +62,10 @@ function InventoryDetails() {
     }
   };
 
-  const handleDeleteItem = async (itemId) => {
-    const ok = window.confirm("Are you sure you want to delete this item?");
-    if (!ok) return;
-
-    try {
-      const res = await fetch(`http://localhost:5000/items/${itemId}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to delete item");
-      }
-
-      fetchItems();
-    } catch (error) {
-      console.log(error);
-      alert("Failed to delete item");
-    }
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("userEmail");
+    navigate("/login");
   };
 
   if (!inventory) {
@@ -90,9 +78,15 @@ function InventoryDetails() {
 
   return (
     <div className="bg-dark text-white min-vh-100 p-5">
-      <Link to="/" className="btn btn-secondary mb-4">
-        Back
-      </Link>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <Link to="/home" className="btn btn-secondary">
+          Back
+        </Link>
+
+        <button className="btn btn-danger" onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
 
       <div className="card bg-secondary text-white p-4 mb-4">
         <h1 className="mb-3">{inventory.title}</h1>
@@ -143,7 +137,6 @@ function InventoryDetails() {
                 <th>#</th>
                 <th>Name</th>
                 <th>Description</th>
-                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -152,14 +145,6 @@ function InventoryDetails() {
                   <td>{index + 1}</td>
                   <td>{item.name}</td>
                   <td>{item.description}</td>
-                  <td>
-                    <button
-                      className="btn btn-danger btn-sm"
-                      onClick={() => handleDeleteItem(item.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
                 </tr>
               ))}
             </tbody>
