@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Inventory {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String
+  creator     String
+  items       Item[]
+}
+
+model Item {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  inventoryId Int
+  inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+}
